@@ -35,9 +35,7 @@ Download the application and provide settings specific to your deployment:
 
         ```sh
         pip install langchain
-        pip install psycopg2
-        # NOTE: Users with M1 Mac machines should install the psycopg2 binary instead:
-        # pip install psycopg2-binary
+        pip install psycopg2-binary
         pip install langchain_openai
         pip install langchain_experimental
         pip install flask
@@ -58,27 +56,25 @@ Start a 3-node YugabyteDB cluster in Docker (or feel free to use another deploym
 # NOTE: if the ~/yb_docker_data already exists on your machine, delete and re-create it
 mkdir ~/yb_docker_data
 
-docker network create custom-network
+docker network create yb-network
 
-docker run -d --name yugabytedb-node1 --net custom-network \
+docker run -d --name ybnode1 --hostname ybnode1 --net yb-network \
     -p 15433:15433 -p 7001:7000 -p 9001:9000 -p 5433:5433 \
     -v ~/yb_docker_data/node1:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.20.1.0-b97 \
+    yugabytedb/yugabyte:2.25.2.0-b359 \
     bin/yugabyted start \
     --base_dir=/home/yugabyte/yb_data --background=false
 
-docker run -d --name yugabytedb-node2 --net custom-network \
-    -p 15434:15433 -p 7002:7000 -p 9002:9000 -p 5434:5433 \
+docker run -d --name ybnode2 --hostname ybnode2 --net yb-network \
     -v ~/yb_docker_data/node2:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.20.1.0-b97 \
-    bin/yugabyted start --join=yugabytedb-node1 \
+    yugabytedb/yugabyte:2.25.2.0-b359 \
+    bin/yugabyted start --join=ybnode1 \
     --base_dir=/home/yugabyte/yb_data --background=false
 
-docker run -d --name yugabytedb-node3 --net custom-network \
-    -p 15435:15433 -p 7003:7000 -p 9003:9000 -p 5435:5433 \
+docker run -d --name ybnode3 --hostname ybnode3 --net yb-network \
     -v ~/yb_docker_data/node3:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.20.1.0-b97 \
-    bin/yugabyted start --join=yugabytedb-node1 \
+    yugabytedb/yugabyte:2.25.2.0-b359 \
+    bin/yugabyted start --join=ybnode1 \
     --base_dir=/home/yugabyte/yb_data --background=false
 ```
 
@@ -95,20 +91,20 @@ The `pg_trgm` PostgreSQL extension is installed to execute similarity searches o
 1. Copy the schema to the first node's Docker container.
 
     ```sh
-    docker cp {project_dir}/sql/schema.sql yugabytedb-node1:/home
+    docker cp sql/schema.sql ybnode1:/home
     ```
 
 2. Copy the seed data file to the Docker container.
 
     ```sh
-    docker cp {project_dir}/sql/generated_data.sql yugabytedb-node1:/home
+    docker cp sql/generated_data.sql ybnode1:/home
     ```
 
 3. Execute the SQL files against the database.
 
     ```sh
-     docker exec -it yugabytedb-node1 bin/ysqlsh -h yugabytedb-node1 -c '\i /home/schema.sql'
-     docker exec -it yugabytedb-node1 bin/ysqlsh -h yugabytedb-node1 -c '\i /home/generated_data.sql'
+     docker exec -it ybnode1 bin/ysqlsh -h ybnode1 -c '\i /home/schema.sql'
+     docker exec -it ybnode1 bin/ysqlsh -h ybnode1 -c '\i /home/generated_data.sql'
     ```
 
 # Start the Flask Server
