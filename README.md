@@ -107,11 +107,11 @@ The `pg_trgm` PostgreSQL extension is installed to execute similarity searches o
      docker exec -it ybnode1 bin/ysqlsh -h ybnode1 -c '\i /home/generated_data.sql'
     ```
 
-# Start the Flask Server
+# Start the Command Line Chatbot
 
-The Flask server for this application exposes a REST endpoint which returns values from the database.
+The application starts a Command Line Chatbot which returns results from the connected database.
 
-1. Start the server.
+1. Start the python app.
 
 ```sh
 python app.py
@@ -121,7 +121,7 @@ python app.py
 What is your question?
 ```
 
-2. Provide a relevant question. For instance:. For instance:
+2. Provide a relevant question. For instance:
 
 ```sh
 
