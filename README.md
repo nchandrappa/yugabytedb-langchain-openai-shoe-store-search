@@ -118,10 +118,10 @@ python app.py
 ```
 
 ```output
-* Running on http://127.0.0.1:8080
+What is your question?
 ```
 
-2. Send a POST request to the `/queries` endpoint with a relevant prompt. For instance:
+2. Provide a relevant question. For instance:. For instance:
 
 ```sh
 
@@ -133,7 +133,9 @@ python app.py
 
 # Find me shoes that are in stock and available in size 15.
 
-curl -X POST http://localhost:8080/queries -H "Content-Type: application/json" -d '{"user_prompt":"Find me shoes that are in stock and available in size 15."}'
+What is your question? 
+
+Find me shoes that are in stock and available in size 15.
 ```
 
 ```output
